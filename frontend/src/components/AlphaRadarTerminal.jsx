@@ -129,7 +129,7 @@ const MOCK_RADAR_INSIGHTS = [
   }
 ];
 
-export function AlphaRadarTerminal() {
+export function AlphaRadarTerminal({ onSelectStock }) {
   const [selectedFactor, setSelectedFactor] = useState('all');
   const [hoveredCard, setHoveredCard] = useState(null);
 
@@ -159,7 +159,7 @@ export function AlphaRadarTerminal() {
             </span>
           </div>
           <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-            Continuously synthesizing cross-asset order flow, volatility surfaces, and macro sector momentum into high-conviction signals.
+            Continuously synthesizing cross-asset order flow, volatility surfaces, and macro sector momentum into high-conviction signals. Click any card for full telemetry.
           </p>
         </div>
 
@@ -203,18 +203,19 @@ export function AlphaRadarTerminal() {
           return (
             <div
               key={insight.id}
+              onClick={() => onSelectStock && onSelectStock(insight.ticker)}
               onMouseEnter={() => setHoveredCard(insight.id)}
               onMouseLeave={() => setHoveredCard(null)}
-              className="group relative bg-[#0b0f19]/90 border border-[#1e2538] hover:border-purple-500/50 rounded-2xl p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 shadow-xl overflow-hidden flex flex-col justify-between"
+              className="group relative bg-[#0b0f19]/90 border border-[#1e2538] hover:border-purple-500/60 rounded-2xl p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 shadow-xl overflow-hidden flex flex-col justify-between cursor-pointer select-none"
               style={{
                 boxShadow: isHovered
-                  ? `0 12px 35px -5px ${insight.glow}, 0 0 20px rgba(132, 0, 255, 0.2)`
+                  ? `0 12px 35px -5px ${insight.glow}, 0 0 25px rgba(132, 0, 255, 0.25)`
                   : 'none'
               }}
             >
               {/* Radial Top Glow Accent */}
               <div
-                className="absolute -top-12 -right-12 w-32 h-32 rounded-full blur-2xl opacity-40 pointer-events-none transition-opacity duration-300 group-hover:opacity-80"
+                className="absolute -top-12 -right-12 w-32 h-32 rounded-full blur-2xl opacity-40 pointer-events-none transition-opacity duration-300 group-hover:opacity-90"
                 style={{ background: insight.glow }}
               />
 
@@ -222,11 +223,11 @@ export function AlphaRadarTerminal() {
                 {/* Header: Ticker & Score */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-center font-mono font-extrabold text-base text-white shadow-inner group-hover:border-cyan-400 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-center font-mono font-extrabold text-base text-white shadow-inner group-hover:border-cyan-400 group-hover:text-cyan-300 transition-colors">
                       {insight.ticker}
                     </div>
                     <div>
-                      <span className="text-xs font-mono font-bold text-slate-200 group-hover:text-cyan-300 transition-colors">
+                      <span className="text-xs font-mono font-bold text-slate-200 group-hover:text-purple-300 transition-colors">
                         {insight.title}
                       </span>
                       <div className="text-[10px] font-mono text-emerald-400 font-semibold flex items-center gap-1">
@@ -260,7 +261,7 @@ export function AlphaRadarTerminal() {
                 </p>
               </div>
 
-              {/* Footer Tags & Sparkline Indicator */}
+              {/* Footer Tags & Deep Dive Prompt */}
               <div className="pt-3 border-t border-[#1e2538]/70 flex items-center justify-between">
                 <div className="flex flex-wrap gap-1">
                   {insight.tags.map((tag, i) => (
@@ -273,8 +274,9 @@ export function AlphaRadarTerminal() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-1 text-slate-500 group-hover:text-cyan-400 transition-colors">
-                  <ArrowUpRight className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-1 text-slate-400 group-hover:text-cyan-300 font-mono text-[10px] transition-colors">
+                  <span>Deep-dive</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </div>
               </div>
             </div>

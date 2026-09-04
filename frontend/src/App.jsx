@@ -189,7 +189,7 @@ export function App() {
               <DataReliabilitySection />
 
               {/* Multi-Factor Alpha Radar & Catalyst Terminal */}
-              <AlphaRadarTerminal />
+              <AlphaRadarTerminal onSelectStock={(sym) => setSelectedStockForDetail(sym)} />
             </>
           )}
         </main>
