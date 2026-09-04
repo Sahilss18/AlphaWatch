@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowDown, Plus, CheckCircle2, History, Sparkles } from 'lucide-react';
+import Shuffle from './Shuffle';
 
 export function HeroSection({
   watchlistPulse,
@@ -20,19 +21,47 @@ export function HeroSection({
           <button
             onClick={onRecordCheckpoint}
             disabled={isRecordingCheckpoint}
-            className="ml-2 px-2 py-0.5 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 text-[10px] text-cyan-200 hover:text-white border border-cyan-500/40 transition-all cursor-pointer"
+            className="ml-2 px-2.5 py-0.5 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 text-[10px] text-cyan-200 hover:text-white border border-cyan-500/40 transition-all cursor-pointer"
             title="Set a new checkpoint right now"
           >
             {isRecordingCheckpoint ? 'Setting...' : 'Set Fresh Checkpoint'}
           </button>
         </div>
 
-        {/* Headline */}
+        {/* Headline with Interactive Shuffle Animation */}
         <div className="max-w-4xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-[1.12]">
-            Markets don't need narrating.{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400">
-              They need what changed.
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-[1.14]">
+            <span className="block mb-1 sm:mb-2">
+              <Shuffle
+                text="Markets don't need narrating."
+                shuffleDirection="right"
+                duration={0.35}
+                animationMode="evenodd"
+                shuffleTimes={1}
+                ease="power3.out"
+                stagger={0.025}
+                threshold={0.1}
+                triggerOnce={true}
+                triggerOnHover={true}
+                respectReducedMotion={true}
+                className="text-white drop-shadow-md cursor-pointer"
+              />
+            </span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400">
+              <Shuffle
+                text="They need what changed."
+                shuffleDirection="right"
+                duration={0.35}
+                animationMode="evenodd"
+                shuffleTimes={1}
+                ease="power3.out"
+                stagger={0.03}
+                threshold={0.1}
+                triggerOnce={true}
+                triggerOnHover={true}
+                respectReducedMotion={true}
+                className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400 cursor-pointer"
+              />
             </span>
           </h1>
 
@@ -55,8 +84,8 @@ export function HeroSection({
               onClick={onOpenAddModal}
               className="flex items-center gap-2 px-5 py-3 rounded-full border border-slate-700 bg-slate-900/80 hover:bg-slate-800 hover:border-slate-600 text-slate-200 font-medium text-sm transition-all active:scale-95 cursor-pointer shadow-sm"
             >
-              <Plus className="w-4 h-4 text-cyan-400" />
-              <span>+ Add Ticker</span>
+              <Plus className="w-4 h-4 text-cyan-400 stroke-[2.5]" />
+              <span>Add Ticker</span>
             </button>
           </div>
         </div>
