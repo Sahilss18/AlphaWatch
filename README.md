@@ -4,7 +4,7 @@
 
 ---
 
-## 100-Word Product Pitch
+## Product Pitch
 
 > Most stock watchlists are noisy firehoses of red and green price tickers that fail to answer the single question that matters: *what actually changed and why does it matter?* **SIGNAL/WATCH** transforms market monitoring into an intelligent attention engine. Powered by real-time exchange data and MySQL snapshot persistence, it diffs current market states against your last visit, filters noise using an adaptive volatility-aware Attention Score (0–100), traces signals through a 5-stage lifecycle state machine, and decodes market context (stock-specific vs. sector vs. market-wide). Clean, explainable, and resilient against API outages.
 
