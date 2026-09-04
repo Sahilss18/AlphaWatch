@@ -59,7 +59,7 @@ export const Shuffle = ({
       if (document.fonts.status === 'loaded') {
         setFontsLoaded(true);
       } else {
-        document.fonts.ready.then(() => setFontsLoaded(true));
+        document.fonts.ready.then(() => setFontsLoaded(true)).catch(() => setFontsLoaded(true));
       }
     } else {
       setFontsLoaded(true);
@@ -86,9 +86,7 @@ export const Shuffle = ({
           tlRef.current.kill();
           tlRef.current = null;
         }
-        if (wrappersRef.current.length) {
-          wrappersRef.current = [];
-        }
+        wrappersRef.current = [];
         playingRef.current = false;
       };
 
@@ -118,7 +116,7 @@ export const Shuffle = ({
           if (/^\s+$/.test(word)) {
             const spaceSpan = document.createElement('span');
             spaceSpan.style.display = 'inline-block';
-            spaceSpan.style.width = '0.55em';
+            spaceSpan.style.width = '0.6em';
             spaceSpan.innerHTML = '&nbsp;';
             el.appendChild(spaceSpan);
             return;
@@ -167,11 +165,9 @@ export const Shuffle = ({
 
             // Assemble track sequence based on direction
             if (shuffleDirection === 'right' || shuffleDirection === 'down') {
-              // Sliding from negative offset into 0
               rollChars.forEach(rc => inner.appendChild(rc));
               inner.appendChild(targetChar);
             } else {
-              // Sliding forward into target
               inner.appendChild(targetChar);
               rollChars.forEach(rc => inner.appendChild(rc));
             }
@@ -184,18 +180,16 @@ export const Shuffle = ({
           el.appendChild(wordContainer);
         });
 
-        // Now calculate measured dimensions cleanly after attaching to DOM
+        // Calculate measured dimensions
         wrappersRef.current.forEach(({ wrap, inner, rolls }) => {
           const cells = inner.querySelectorAll('.shuffle-cell');
           if (!cells.length) return;
 
-          // Measure single cell size
           const sampleCell = cells[0];
           const rect = sampleCell.getBoundingClientRect();
-          const cellW = Math.max(12, Math.ceil(rect.width || 18));
-          const cellH = Math.max(16, Math.ceil(rect.height || 24));
+          const cellW = Math.max(10, Math.ceil(rect.width || 18));
+          const cellH = Math.max(14, Math.ceil(rect.height || 24));
 
-          // Set fixed uniform dimensions on cell items
           cells.forEach(cell => {
             cell.style.width = `${cellW}px`;
             cell.style.height = `${cellH}px`;
@@ -324,15 +318,24 @@ export const Shuffle = ({
         setIsReady(true);
       };
 
-      const st = ScrollTrigger.create({
-        trigger: el,
-        start,
-        once: triggerOnce,
-        onEnter: create
-      });
+      // If already in viewport (e.g. Hero Section on load), execute immediately
+      const rect = el.getBoundingClientRect();
+      const inView = rect.top < (window.innerHeight || document.documentElement.clientHeight);
+
+      let st = null;
+      if (inView) {
+        create();
+      } else {
+        st = ScrollTrigger.create({
+          trigger: el,
+          start: scrollTriggerStart,
+          once: triggerOnce,
+          onEnter: create
+        });
+      }
 
       return () => {
-        st.kill();
+        if (st) st.kill();
         removeHover();
         teardown();
         setIsReady(false);
