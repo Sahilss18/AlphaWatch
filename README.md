@@ -1,4 +1,4 @@
-# SIGNAL/WATCH — Smart Market Watchlist
+# AlphaWatch : Smart Market Watchlist
 
 > **"Markets don't need narrating. They need what changed."**
 
@@ -6,13 +6,13 @@
 
 ## Product Pitch
 
-> Most stock watchlists are noisy firehoses of red and green price tickers that fail to answer the single question that matters: *what actually changed and why does it matter?* **SIGNAL/WATCH** transforms market monitoring into an intelligent attention engine. Powered by real-time exchange data and MySQL snapshot persistence, it diffs current market states against your last visit, filters noise using an adaptive volatility-aware Attention Score (0–100), traces signals through a 5-stage lifecycle state machine, and decodes market context (stock-specific vs. sector vs. market-wide). Clean, explainable, and resilient against API outages.
+> Most stock watchlists are noisy firehoses of red and green price tickers that fail to answer the single question that matters: *what actually changed and why does it matter?* **AlphaWatch** transforms market monitoring into an intelligent attention engine. Powered by real-time exchange data and MySQL snapshot persistence, it diffs current market states against your last visit, filters noise using an adaptive volatility-aware Attention Score (0–100), traces signals through a 5-stage lifecycle state machine, and decodes market context (stock-specific vs. sector vs. market-wide). Clean, explainable, and resilient against API outages.
 
 ---
 
 ## Evaluation and Judging Criteria Alignment
 
-| Evaluation Dimension | How SIGNAL/WATCH Delivers It | Implementation Reference |
+| Evaluation Dimension | How AlphaWatch Delivers It | Implementation Reference |
 | :--- | :--- | :--- |
 | **Engineering Depth** | Multi-tier asynchronous pipeline built with FastAPI, in-memory TTL rate caching, relational MySQL snapshot ledger, high-precision statistical Z-scoring, and a React Vite frontend. | [`market_data.py`](file:///c:/Users/sahil/Downloads/Smart%20Watchlist/backend/app/services/market_data.py), [`signal_engine.py`](file:///c:/Users/sahil/Downloads/Smart%20Watchlist/backend/app/services/signal_engine.py) |
 | **Product & Problem Interpretation** | Moves beyond naive percent-change thresholds. Mitigates alert fatigue via Attention Budgets (Top 3–5 assets), noise suppression for quiet stocks, and visit checkpoint diffing. | [`WatchlistPulse.jsx`](file:///c:/Users/sahil/Downloads/Smart%20Watchlist/frontend/src/components/WatchlistPulse.jsx), [`QuietStocksSummary.jsx`](file:///c:/Users/sahil/Downloads/Smart%20Watchlist/frontend/src/components/QuietStocksSummary.jsx) |
