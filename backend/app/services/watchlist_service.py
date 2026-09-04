@@ -109,21 +109,22 @@ class WatchlistService:
         last_visit_time, seconds_away, formatted_away = SnapshotService.get_user_last_visit(db, user_id)
 
         symbols = [s.symbol.upper() for s in stocks]
-        quotes_tasks = [market_service.get_live_quote(sym) for sym in symbols]
+        all_fetch_symbols = list(dict.fromkeys(symbols + ["SPY"]))
+        quotes_tasks = [market_service.get_live_quote(sym) for sym in all_fetch_symbols]
         metrics_tasks = [market_service.get_stock_metrics(sym) for sym in symbols]
         
-        quotes_results, metrics_results = await asyncio.gather(
+        raw_quotes, metrics_results = await asyncio.gather(
             asyncio.gather(*quotes_tasks),
             asyncio.gather(*metrics_tasks)
         )
 
-        # Build map of quotes for sector context
         quotes_map: Dict[str, MarketDataResult] = {}
-        for idx, s in enumerate(stocks):
-            sym = s.symbol.upper()
-            q = quotes_results[idx]
+        for idx, sym in enumerate(all_fetch_symbols):
+            q = raw_quotes[idx]
             if q:
                 quotes_map[sym] = q
+
+        quotes_results = [quotes_map.get(sym) for sym in symbols]
 
         items: List[WatchlistItemResponse] = []
         total_deviation = 0.0
@@ -326,20 +327,22 @@ class WatchlistService:
         last_visit_time, _, _ = SnapshotService.get_user_last_visit(db, user_id)
 
         symbols = [s.symbol.upper() for s in stocks]
-        quotes_tasks = [market_service.get_live_quote(sym) for sym in symbols]
+        all_fetch_symbols = list(dict.fromkeys(symbols + ["SPY"]))
+        quotes_tasks = [market_service.get_live_quote(sym) for sym in all_fetch_symbols]
         metrics_tasks = [market_service.get_stock_metrics(sym) for sym in symbols]
         
-        quotes_results, metrics_results = await asyncio.gather(
+        raw_quotes, metrics_results = await asyncio.gather(
             asyncio.gather(*quotes_tasks),
             asyncio.gather(*metrics_tasks)
         )
 
         quotes_map: Dict[str, MarketDataResult] = {}
-        for idx, s in enumerate(stocks):
-            sym = s.symbol.upper()
-            q = quotes_results[idx]
+        for idx, sym in enumerate(all_fetch_symbols):
+            q = raw_quotes[idx]
             if q:
                 quotes_map[sym] = q
+
+        quotes_results = [quotes_map.get(sym) for sym in symbols]
 
         signals_list: List[SignalDetailResponse] = []
         quiet_count = 0
