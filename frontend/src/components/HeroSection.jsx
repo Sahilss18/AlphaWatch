@@ -29,21 +29,22 @@ export function HeroSection({
         </div>
 
         {/* Headline with Interactive Shuffle Animation */}
-        <div className="max-w-4xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-[1.14]">
-            <span className="block mb-1 sm:mb-2">
+        <div className="max-w-5xl">
+          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-[2.1rem] font-bold uppercase tracking-wider text-white leading-[1.65]">
+            <span className="block mb-2 sm:mb-3">
               <Shuffle
                 text="Markets don't need narrating."
                 shuffleDirection="right"
                 duration={0.35}
                 animationMode="evenodd"
-                shuffleTimes={1}
+                shuffleTimes={2}
                 ease="power3.out"
                 stagger={0.025}
                 threshold={0.1}
                 triggerOnce={true}
                 triggerOnHover={true}
                 respectReducedMotion={true}
+                style={{ fontFamily: "'Press Start 2P', monospace" }}
                 className="text-white drop-shadow-md cursor-pointer"
               />
             </span>
@@ -53,13 +54,14 @@ export function HeroSection({
                 shuffleDirection="right"
                 duration={0.35}
                 animationMode="evenodd"
-                shuffleTimes={1}
+                shuffleTimes={2}
                 ease="power3.out"
                 stagger={0.03}
                 threshold={0.1}
                 triggerOnce={true}
                 triggerOnHover={true}
                 respectReducedMotion={true}
+                style={{ fontFamily: "'Press Start 2P', monospace" }}
                 className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400 cursor-pointer"
               />
             </span>
