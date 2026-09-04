@@ -10,7 +10,7 @@ import { SignalFeed } from './components/SignalFeed';
 import { QuietStocksSummary } from './components/QuietStocksSummary';
 import { WatchlistGrid } from './components/WatchlistGrid';
 import { DataReliabilitySection } from './components/DataReliabilitySection';
-import { ArchitectureSection } from './components/ArchitectureSection';
+import { AlphaRadarTerminal } from './components/AlphaRadarTerminal';
 import { Footer } from './components/Footer';
 import { AddTickerModal } from './components/AddTickerModal';
 import { StockDetailModal } from './components/StockDetailModal';
@@ -188,10 +188,8 @@ export function App() {
               {/* Data Reliability Section */}
               <DataReliabilitySection />
 
-              {/* Architecture Explanation Section */}
-              <div id="architecture">
-                <ArchitectureSection />
-              </div>
+              {/* Multi-Factor Alpha Radar & Catalyst Terminal */}
+              <AlphaRadarTerminal />
             </>
           )}
         </main>

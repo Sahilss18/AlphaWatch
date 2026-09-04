@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, RefreshCw, Sun, Moon, ShieldAlert, Wifi, Clock, Plus, Sparkles, ChevronRight } from 'lucide-react';
 import { formatTimeAgo } from '../utils/formatters';
+import PillNav from './PillNav';
 
 export function TopNav({
   apiStatus,
@@ -54,41 +55,25 @@ export function TopNav({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#1e293b]/70 bg-[#080c16]/80 backdrop-blur-xl shadow-2xl transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand & AlphaWatch Logo */}
-        <div className="flex items-center gap-6">
-          <a href="#" className="flex items-center gap-2.5 group">
-            <div className="relative w-9 h-9 flex items-center justify-center rounded-lg overflow-hidden bg-slate-900/60 border border-slate-700/60 p-0.5 group-hover:border-cyan-500/50 transition-all shadow-md shadow-cyan-500/10">
-              <img
-                src="/alphawatch-logo-transparent.png"
-                alt="AlphaWatch AW Logo"
-                className="w-full h-full object-contain filter drop-shadow group-hover:scale-105 transition-transform"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="font-display font-extrabold text-xl tracking-wide text-white group-hover:text-cyan-400 transition-colors">
-                  Alpha<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Watch</span>
-                </span>
-                <span className="hidden md:inline-block px-1.5 py-0.2 rounded bg-indigo-500/20 text-[10px] font-mono font-bold text-indigo-300 border border-indigo-500/30">
-                  PRO
-                </span>
-              </div>
-              <span className="hidden md:block text-[10px] text-slate-400 font-mono tracking-tight -mt-0.5">
-                Market Intelligence Terminal
-              </span>
-            </div>
-          </a>
-
-          {/* Flowbase-style Navigation links */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
-            <a href="#signals" className="hover:text-white transition-colors">Intelligence</a>
-            <a href="#watchlist" className="hover:text-purple-300 transition-colors">Watchlist</a>
-            <a href="#pulse" className="hover:text-white transition-colors">Pulse & Health</a>
-            <a href="#architecture" className="hover:text-slate-200 transition-colors text-slate-400">Architecture</a>
-          </nav>
+        {/* Left Side: Brand Logo & PillNav */}
+        <div className="flex items-center gap-4">
+          <PillNav
+            logo="/alphawatch-logo-transparent.png"
+            logoAlt="AlphaWatch Logo"
+            items={[
+              { label: 'Intelligence', href: '#signals' },
+              { label: 'Watchlist', href: '#watchlist' },
+              { label: 'Pulse', href: '#pulse' },
+              { label: 'Alpha Radar', href: '#radar' }
+            ]}
+            activeHref="#signals"
+            ease="power2.out"
+            baseColor="#0b0f19"
+            pillColor="#131b2e"
+            hoveredPillTextColor="#ffffff"
+            pillTextColor="#94a3b8"
+            initialLoadAnimation={false}
+          />
         </div>
 
         {/* Right Actions & Flowbase style CTA Pill */}
