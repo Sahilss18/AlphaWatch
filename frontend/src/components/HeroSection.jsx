@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowDown, Plus, CheckCircle2, History, Sparkles } from 'lucide-react';
-import Shuffle from './Shuffle';
 
 export function HeroSection({
   watchlistPulse,
@@ -28,26 +27,17 @@ export function HeroSection({
           </button>
         </div>
 
-        {/* Headline with Interactive Shuffle Animation */}
+        {/* Headline with Fraktur Bold Font */}
         <div className="max-w-4xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-[1.12]">
-            <span className="block mb-1 sm:mb-2">
-              <Shuffle
-                text="Markets don't need narrating."
-                duration={0.35}
-                stagger={0.02}
-                triggerOnHover={true}
-                className="text-white drop-shadow-md cursor-pointer hover:text-cyan-200 transition-colors"
-              />
+          <h1
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-normal text-white leading-[1.15]"
+            style={{ fontFamily: "'UnifrakturCook', 'UnifrakturMaguntia', 'Fraktur', serif, cursive" }}
+          >
+            <span className="block mb-1 sm:mb-2 text-slate-100 drop-shadow-md">
+              Markets don't need narrating.
             </span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400">
-              <Shuffle
-                text="They need what changed."
-                duration={0.4}
-                stagger={0.025}
-                triggerOnHover={true}
-                className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400 cursor-pointer"
-              />
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400 drop-shadow-[0_4px_20px_rgba(132,0,255,0.35)]">
+              They need what changed.
             </span>
           </h1>
 
