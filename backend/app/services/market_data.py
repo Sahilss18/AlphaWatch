@@ -98,14 +98,21 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
         self.last_successful_call: Optional[datetime] = None
         self.last_api_error: Optional[str] = None
         self.is_connected: bool = False
+        self.rate_limit_cooldown_until: float = 0.0
 
     def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
-            self._client = httpx.AsyncClient(timeout=8.0)
+            self._client = httpx.AsyncClient(timeout=4.0)
         return self._client
+
+    def _is_rate_limited(self) -> bool:
+        return time.time() < self.rate_limit_cooldown_until
 
     async def get_quote(self, symbol: str) -> Optional[MarketDataResult]:
         symbol = symbol.upper().strip()
+        if self._is_rate_limited():
+            return None
+
         url = f"{self.base_url}/quote"
         params = {"symbol": symbol, "token": self.api_key}
 
@@ -142,8 +149,9 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
                 else:
                     logger.warning(f"Finnhub returned empty/zero quote for {symbol}: {data}")
             elif resp.status_code == 429:
+                self.rate_limit_cooldown_until = time.time() + 45.0  # 45s cooldown
                 self.last_api_error = "Rate limit reached (429)"
-                logger.warning(f"Finnhub rate limited (429) for {symbol}")
+                logger.warning(f"Finnhub rate limited (429) for {symbol}. Activating 45s cooldown.")
             else:
                 self.last_api_error = f"HTTP {resp.status_code}: {resp.text}"
                 logger.error(f"Finnhub quote API error for {symbol}: {self.last_api_error}")
@@ -155,6 +163,9 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
 
     async def get_company_profile(self, symbol: str) -> Optional[Dict[str, Any]]:
         symbol = symbol.upper().strip()
+        if self._is_rate_limited():
+            return None
+
         url = f"{self.base_url}/stock/profile2"
         params = {"symbol": symbol, "token": self.api_key}
 
@@ -172,6 +183,8 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
                         "logo": data.get("logo", ""),
                         "currency": data.get("currency", "USD")
                     }
+            elif resp.status_code == 429:
+                self.rate_limit_cooldown_until = time.time() + 45.0
         except Exception as e:
             logger.warning(f"Could not fetch profile for {symbol}: {e}")
         return None
@@ -356,7 +369,13 @@ class MarketDataService:
             stale_entry.source = "cache_fallback"
             return stale_entry
 
-        return None
+        # Generate deterministic baseline quote and cache it for TTL to prevent 429 storms
+        fallback = self.get_fallback_baseline_quote(symbol)
+        self.quote_cache[symbol] = {
+            "cached_at": now,
+            "result": fallback
+        }
+        return fallback
 
     async def get_company_name(self, symbol: str) -> str:
         symbol = symbol.upper().strip()
@@ -366,6 +385,7 @@ class MarketDataService:
         # Check catalog
         for item in KNOWN_STOCKS_CATALOG:
             if item["symbol"] == symbol:
+                self.profile_cache[symbol] = {"name": item["name"]}
                 return item["name"]
 
         profile = await self.provider.get_company_profile(symbol)
@@ -373,7 +393,9 @@ class MarketDataService:
             self.profile_cache[symbol] = profile
             return profile["name"]
         
-        return f"{symbol} Inc."
+        fallback_name = f"{symbol} Inc."
+        self.profile_cache[symbol] = {"name": fallback_name}
+        return fallback_name
 
     async def get_stock_metrics(self, symbol: str) -> Dict[str, Any]:
         symbol = symbol.upper().strip()

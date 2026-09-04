@@ -482,8 +482,8 @@ class WatchlistService:
         )
 
     @staticmethod
-    async def add_stock_to_watchlist(db: Session, symbol: str, company_name: Optional[str] = None, user_id: str = "demo-user-001") -> WatchlistStock:
-        """Add ticker to watchlist, persist snapshot, and fetch metadata."""
+    async def add_stock_to_watchlist(db: Session, symbol: str, company_name: Optional[str] = None, user_id: str = "demo-user-001") -> Tuple[WatchlistStock, bool]:
+        """Add ticker to watchlist, persist snapshot, and fetch metadata. Returns (stock, is_new)."""
         user, watchlist = WatchlistService.ensure_demo_user(db, user_id)
         clean_sym = symbol.upper().strip()
 
@@ -491,7 +491,7 @@ class WatchlistService:
             .filter(WatchlistStock.watchlist_id == watchlist.id, WatchlistStock.symbol == clean_sym)\
             .first()
         if existing:
-            return existing
+            return existing, False
 
         market_service = MarketDataService.get_instance()
         if not company_name:
@@ -512,7 +512,7 @@ class WatchlistService:
         
         SnapshotService.record_snapshot(db, quote)
         
-        return stock
+        return stock, True
 
     @staticmethod
     def remove_stock_from_watchlist(db: Session, symbol: str, user_id: str = "demo-user-001") -> bool:

@@ -82,10 +82,15 @@ export function useMarketData() {
   // Add stock ticker
   const addTicker = async (symbol, companyName = null) => {
     try {
-      await api.addTicker(symbol, companyName);
-      await fetchAllData(true);
-      return { success: true };
+      const res = await api.addTicker(symbol, companyName);
+      try {
+        await fetchAllData(true);
+      } catch (refreshErr) {
+        console.warn('Background refresh after addTicker had minor delay:', refreshErr);
+      }
+      return res || { success: true };
     } catch (err) {
+      console.error('Failed to add ticker:', err);
       throw err;
     }
   };
@@ -93,10 +98,15 @@ export function useMarketData() {
   // Remove stock ticker
   const removeTicker = async (symbol) => {
     try {
-      await api.removeTicker(symbol);
-      await fetchAllData(true);
-      return { success: true };
+      const res = await api.removeTicker(symbol);
+      try {
+        await fetchAllData(true);
+      } catch (refreshErr) {
+        console.warn('Background refresh after removeTicker had minor delay:', refreshErr);
+      }
+      return res || { success: true };
     } catch (err) {
+      console.error('Failed to remove ticker:', err);
       throw err;
     }
   };

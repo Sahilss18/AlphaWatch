@@ -203,6 +203,7 @@ export function App() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddSuccess={addTicker}
+        existingSymbols={watchlist?.items?.map((i) => i.symbol) || []}
       />
 
       {/* Stock Deep Dive Detail Modal */}

@@ -15,7 +15,7 @@ const POPULAR_SUGGESTIONS = [
   { symbol: 'COIN', name: 'Coinbase Global' },
 ];
 
-export function AddTickerModal({ isOpen, onClose, onAddSuccess }) {
+export function AddTickerModal({ isOpen, onClose, onAddSuccess, existingSymbols = [] }) {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -24,6 +24,7 @@ export function AddTickerModal({ isOpen, onClose, onAddSuccess }) {
   const [successMessage, setSuccessMessage] = useState('');
 
   const inputRef = useRef(null);
+  const normalizedExisting = new Set((existingSymbols || []).map((s) => s.toUpperCase()));
 
   useEffect(() => {
     if (isOpen) {
@@ -53,7 +54,7 @@ export function AddTickerModal({ isOpen, onClose, onAddSuccess }) {
       } finally {
         setIsSearching(false);
       }
-    }, 300);
+    }, 250);
 
     return () => clearTimeout(timer);
   }, [query]);
@@ -61,18 +62,25 @@ export function AddTickerModal({ isOpen, onClose, onAddSuccess }) {
   if (!isOpen) return null;
 
   const handleAdd = async (symbol, name) => {
+    if (!symbol) return;
+    const cleanSym = symbol.trim().toUpperCase();
+
     setIsAdding(true);
     setErrorMessage('');
     setSuccessMessage('');
 
     try {
-      await onAddSuccess(symbol, name);
-      setSuccessMessage(`Successfully added ${symbol} to watchlist!`);
+      const res = await onAddSuccess(cleanSym, name);
+      if (res && res.is_new === false) {
+        setSuccessMessage(`${cleanSym} is already in your watchlist.`);
+      } else {
+        setSuccessMessage(`Successfully added ${cleanSym} to watchlist!`);
+      }
       setTimeout(() => {
         onClose();
       }, 700);
     } catch (err) {
-      setErrorMessage(err.message || `Failed to add ${symbol}.`);
+      setErrorMessage(err.message || `Failed to add ${cleanSym}.`);
     } finally {
       setIsAdding(false);
     }
@@ -162,35 +170,57 @@ export function AddTickerModal({ isOpen, onClose, onAddSuccess }) {
               <div className="text-[11px] font-mono text-slate-400 uppercase mb-1">
                 Search Results:
               </div>
-              {searchResults.map((item) => (
-                <div
-                  key={item.symbol}
-                  className="p-2.5 rounded bg-[#131c31] border border-[#1e293b] hover:border-slate-600 flex items-center justify-between transition-colors group"
-                >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-sm text-slate-100 group-hover:text-emerald-400">
-                        {item.display_symbol || item.symbol}
-                      </span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
-                        {item.type}
-                      </span>
-                    </div>
-                    <p className="text-xs font-mono text-slate-400 truncate max-w-xs">
-                      {item.description}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => handleAdd(item.symbol, item.description)}
-                    disabled={isAdding}
-                    className="px-3 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold font-mono transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1 cursor-pointer"
+              {searchResults.map((item) => {
+                const sym = (item.symbol || '').toUpperCase();
+                const isTracked = normalizedExisting.has(sym);
+                return (
+                  <div
+                    key={item.symbol}
+                    className="p-2.5 rounded bg-[#131c31] border border-[#1e293b] hover:border-slate-600 flex items-center justify-between transition-colors group"
                   >
-                    <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                    <span>Track</span>
-                  </button>
-                </div>
-              ))}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-sm text-slate-100 group-hover:text-emerald-400">
+                          {item.display_symbol || item.symbol}
+                        </span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
+                          {item.type}
+                        </span>
+                        {isTracked && (
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <CheckCircle2 className="w-2.5 h-2.5" /> Tracked
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs font-mono text-slate-400 truncate max-w-xs">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleAdd(item.symbol, item.description)}
+                      disabled={isAdding}
+                      className={`px-3 py-1.5 rounded text-xs font-bold font-mono transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1 cursor-pointer ${
+                        isTracked
+                          ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                          : 'bg-emerald-500 hover:bg-emerald-400 text-black'
+                      }`}
+                    >
+                      {isTracked ? (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Tracked</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <span>Track</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div>
@@ -198,24 +228,42 @@ export function AddTickerModal({ isOpen, onClose, onAddSuccess }) {
                 Popular High-Velocity Tickers:
               </div>
               <div className="grid grid-cols-2 gap-2">
-                {POPULAR_SUGGESTIONS.map((sug) => (
-                  <button
-                    key={sug.symbol}
-                    onClick={() => handleAdd(sug.symbol, sug.name)}
-                    disabled={isAdding}
-                    className="p-2 rounded bg-[#131c31] border border-[#1e293b] hover:border-emerald-500/50 hover:bg-[#19243d] text-left transition-all group flex items-center justify-between cursor-pointer"
-                  >
-                    <div>
-                      <div className="font-mono font-bold text-xs text-slate-200 group-hover:text-emerald-400">
-                        {sug.symbol}
+                {POPULAR_SUGGESTIONS.map((sug) => {
+                  const isTracked = normalizedExisting.has(sug.symbol.toUpperCase());
+                  return (
+                    <button
+                      key={sug.symbol}
+                      onClick={() => handleAdd(sug.symbol, sug.name)}
+                      disabled={isAdding}
+                      className={`p-2 rounded border text-left transition-all group flex items-center justify-between cursor-pointer ${
+                        isTracked
+                          ? 'bg-[#101726] border-emerald-500/30'
+                          : 'bg-[#131c31] border-[#1e293b] hover:border-emerald-500/50 hover:bg-[#19243d]'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-xs text-slate-200 group-hover:text-emerald-400">
+                            {sug.symbol}
+                          </span>
+                          {isTracked && (
+                            <span className="text-[9px] font-mono px-1 rounded bg-emerald-500/20 text-emerald-400">
+                              Tracked
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-500 truncate max-w-[120px]">
+                          {sug.name}
+                        </div>
                       </div>
-                      <div className="text-[10px] font-mono text-slate-500 truncate max-w-[120px]">
-                        {sug.name}
-                      </div>
-                    </div>
-                    <Plus className="w-3.5 h-3.5 text-slate-500 group-hover:text-emerald-400" />
-                  </button>
-                ))}
+                      {isTracked ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Plus className="w-3.5 h-3.5 text-slate-500 group-hover:text-emerald-400" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

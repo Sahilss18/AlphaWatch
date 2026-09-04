@@ -36,15 +36,17 @@ async def add_ticker(
     db: Session = Depends(get_db)
 ):
     """Add a stock ticker to user's watchlist."""
-    stock = await WatchlistService.add_stock_to_watchlist(
+    stock, is_new = await WatchlistService.add_stock_to_watchlist(
         db=db,
         symbol=payload.symbol,
         company_name=payload.company_name,
         user_id=user_id
     )
+    msg = f"Successfully added {stock.symbol} to watchlist" if is_new else f"{stock.symbol} is already in your watchlist"
     return {
         "success": True,
-        "message": f"Successfully added {stock.symbol} to watchlist",
+        "is_new": is_new,
+        "message": msg,
         "symbol": stock.symbol,
         "company_name": stock.company_name
     }
