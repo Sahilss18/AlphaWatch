@@ -15,7 +15,8 @@ import { Footer } from './components/Footer';
 import { AddTickerModal } from './components/AddTickerModal';
 import { StockDetailModal } from './components/StockDetailModal';
 import LiquidEther from './components/LiquidEther';
-import { AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
+import MagicBento from './components/MagicBento';
+import { AlertCircle, RefreshCw, Loader2, Sparkles, LayoutGrid } from 'lucide-react';
 
 export function App() {
   const {
@@ -174,6 +175,42 @@ export function App() {
 
               {/* Noise Suppression Summary */}
               <QuietStocksSummary pulse={watchlist?.pulse} />
+
+              {/* AlphaWatch Intelligence Matrix - Magic Bento */}
+              <section id="matrix" className="w-full pt-4 pb-2">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-4 gap-2">
+                  <div>
+                    <div className="flex items-center gap-2 text-xs font-mono font-semibold text-purple-400 uppercase tracking-wider mb-1">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>INTELLIGENCE CAPABILITIES</span>
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-100">
+                      Smart Intelligence Matrix
+                    </h2>
+                    <p className="text-sm text-slate-400 mt-1">
+                      Interactive real-time modules powering delta calculation, attention budgeting, and zero-fatigue baseline checkpoints.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+                    <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                    <span>Interactive Cursor Spotlight</span>
+                  </div>
+                </div>
+
+                <MagicBento 
+                  textAutoHide={true}
+                  enableStars
+                  enableSpotlight
+                  enableBorderGlow={true}
+                  enableTilt={false}
+                  enableMagnetism={false}
+                  clickEffect
+                  spotlightRadius={400}
+                  particleCount={12}
+                  glowColor="132, 0, 255"
+                  disableAnimations={false}
+                />
+              </section>
 
               {/* Full Watchlist Grid */}
               <div id="watchlist">

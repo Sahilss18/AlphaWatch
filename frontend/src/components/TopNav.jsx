@@ -85,6 +85,7 @@ export function TopNav({
           {/* Flowbase-style Navigation links */}
           <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
             <a href="#signals" className="hover:text-white transition-colors">Intelligence</a>
+            <a href="#matrix" className="hover:text-purple-300 transition-colors">Matrix</a>
             <a href="#watchlist" className="hover:text-white transition-colors">Watchlist</a>
             <a href="#pulse" className="hover:text-white transition-colors">Pulse & Health</a>
             <a href="#architecture" className="hover:text-slate-200 transition-colors text-slate-400">Architecture</a>
