@@ -53,7 +53,7 @@ export function useMarketData() {
     } catch (err) {
       console.error('Failed to load market data:', err);
       if (isMounted.current) {
-        setError(err.message || 'Failed to communicate with Signal Watch backend.');
+        setError(err.message || 'Failed to communicate with AlphaWatch backend.');
       }
     } finally {
       if (isMounted.current) {

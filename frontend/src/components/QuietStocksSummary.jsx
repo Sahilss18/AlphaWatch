@@ -26,7 +26,7 @@ export function QuietStocksSummary({ pulse }) {
             </span>
           </div>
           <p className="text-xs text-slate-400 font-mono mt-0.5 max-w-xl">
-            Signal/Watch continuously monitors your entire portfolio. Assets moving within normal daily volatility parameters are intentionally suppressed from alert feeds to prevent notification fatigue.
+            AlphaWatch continuously monitors your entire portfolio. Assets moving within normal daily volatility parameters are intentionally suppressed from alert feeds to prevent notification fatigue.
           </p>
         </div>
       </div>

@@ -14,6 +14,7 @@ import { ArchitectureSection } from './components/ArchitectureSection';
 import { Footer } from './components/Footer';
 import { AddTickerModal } from './components/AddTickerModal';
 import { StockDetailModal } from './components/StockDetailModal';
+import { LiquidEther } from './components/LiquidEther';
 import { AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 
 export function App() {
@@ -54,9 +55,35 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060911] text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-black">
-      {/* Background Grid Accent */}
-      <div className="fixed inset-0 bg-tech-grid opacity-75 pointer-events-none z-0"></div>
+    <div className="min-h-screen bg-[#060911] text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-black relative overflow-x-hidden">
+      {/* Interactive LiquidEther Background Canvas */}
+      <div className="absolute top-0 left-0 right-0 h-[650px] pointer-events-none z-0 overflow-hidden opacity-90">
+        <div style={{ width: '100%', height: 650, position: 'relative' }}>
+          <LiquidEther
+            colors={[ '#5227FF', '#FF9FFC', '#B497CF' ]}
+            mouseForce={20}
+            cursorSize={100}
+            isViscous
+            viscous={30}
+            iterationsViscous={32}
+            iterationsPoisson={32}
+            resolution={0.5}
+            isBounce={false}
+            autoDemo
+            autoSpeed={0.5}
+            autoIntensity={2.2}
+            takeoverDuration={0.25}
+            autoResumeDelay={3000}
+            autoRampDuration={0.6}
+            color0="#5227FF"
+            color1="#FF9FFC"
+            color2="#B497CF"
+          />
+        </div>
+      </div>
+
+      {/* Tech Grid Accent Overlay */}
+      <div className="fixed inset-0 bg-tech-grid opacity-50 pointer-events-none z-0"></div>
 
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Top Navigation */}
@@ -67,6 +94,7 @@ export function App() {
           theme={theme}
           onToggleTheme={toggleTheme}
           onOpenAddModal={() => setIsAddModalOpen(true)}
+          onRecordCheckpoint={handleRecordCheckpoint}
           lastRefreshedAt={lastRefreshedAt}
         />
 
@@ -99,12 +127,12 @@ export function App() {
           {isLoading && !watchlist ? (
             <div className="py-24 flex flex-col items-center justify-center space-y-4">
               <div className="relative w-16 h-16 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border-2 border-emerald-500/20 border-t-emerald-400 animate-spin"></div>
-                <Loader2 className="w-6 h-6 text-emerald-400 animate-pulse" />
+                <div className="absolute inset-0 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin"></div>
+                <Loader2 className="w-6 h-6 text-cyan-400 animate-pulse" />
               </div>
               <div className="text-center font-mono">
                 <h3 className="text-sm font-bold text-slate-200">
-                  Initializing Signal/Watch Engine...
+                  Initializing AlphaWatch Engine...
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
                   Connecting to live market feeds & calculating snapshot diffs
@@ -123,7 +151,9 @@ export function App() {
               />
 
               {/* Watchlist Pulse & Health Component */}
-              <WatchlistPulse pulse={watchlist?.pulse} health={watchlist?.health} />
+              <div id="pulse">
+                <WatchlistPulse pulse={watchlist?.pulse} health={watchlist?.health} />
+              </div>
 
               {/* Top Attention Budget */}
               <AttentionRanking
@@ -133,29 +163,35 @@ export function App() {
               />
 
               {/* What Deserves Your Attention - Signals Feed */}
-              <SignalFeed
-                signals={signals}
-                selectedSymbol={selectedStockForDetail}
-                onSelectStock={(sym) => setSelectedStockForDetail(sym)}
-                feedRef={signalFeedRef}
-              />
+              <div id="signals" ref={signalFeedRef}>
+                <SignalFeed
+                  signals={signals}
+                  selectedSymbol={selectedStockForDetail}
+                  onSelectStock={(sym) => setSelectedStockForDetail(sym)}
+                  feedRef={signalFeedRef}
+                />
+              </div>
 
               {/* Noise Suppression Summary */}
               <QuietStocksSummary pulse={watchlist?.pulse} />
 
               {/* Full Watchlist Grid */}
-              <WatchlistGrid
-                watchlist={watchlist}
-                onOpenAddModal={() => setIsAddModalOpen(true)}
-                onSelectStock={(sym) => setSelectedStockForDetail(sym)}
-                onRemoveStock={removeTicker}
-              />
+              <div id="watchlist">
+                <WatchlistGrid
+                  watchlist={watchlist}
+                  onOpenAddModal={() => setIsAddModalOpen(true)}
+                  onSelectStock={(sym) => setSelectedStockForDetail(sym)}
+                  onRemoveStock={removeTicker}
+                />
+              </div>
 
               {/* Data Reliability Section */}
               <DataReliabilitySection />
 
               {/* Architecture Explanation Section */}
-              <ArchitectureSection />
+              <div id="architecture">
+                <ArchitectureSection />
+              </div>
             </>
           )}
         </main>
@@ -182,3 +218,4 @@ export function App() {
 }
 
 export default App;
+
