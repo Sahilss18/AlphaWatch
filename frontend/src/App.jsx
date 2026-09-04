@@ -56,9 +56,9 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#060911] text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-black relative overflow-x-hidden">
-      {/* Interactive LiquidEther Background Canvas */}
-      <div className="absolute top-0 left-0 right-0 h-[650px] pointer-events-none z-0 overflow-hidden opacity-90">
-        <div style={{ width: '100%', height: 650, position: 'relative' }}>
+      {/* Interactive Full-Page LiquidEther Background Canvas */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-85">
+        <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
           <LiquidEther
             colors={[ '#5227FF', '#FF9FFC', '#B497CF' ]}
             mouseForce={20}
