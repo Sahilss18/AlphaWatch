@@ -48,8 +48,15 @@ class WatchlistService:
 
     @staticmethod
     def ensure_demo_user(db: Session, user_id: str = "demo-user-001") -> Tuple[User, Watchlist]:
-        """Ensure demo user, primary watchlist, and initial seed stocks exist in MySQL."""
-        user = db.query(User).filter(User.id == user_id).first()
+        """Ensure demo user, primary watchlist, and initial seed stocks exist."""
+        from app.database import Base
+        try:
+            user = db.query(User).filter(User.id == user_id).first()
+        except Exception:
+            db.rollback()
+            Base.metadata.create_all(bind=db.get_bind())
+            user = db.query(User).filter(User.id == user_id).first()
+
         if not user:
             user = User(
                 id=user_id,
