@@ -56,10 +56,15 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
     def __init__(self, api_key: str, base_url: str):
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
-        self.client = httpx.AsyncClient(timeout=8.0)
+        self._client: Optional[httpx.AsyncClient] = None
         self.last_successful_call: Optional[datetime] = None
         self.last_api_error: Optional[str] = None
         self.is_connected: bool = False
+
+    def _get_client(self) -> httpx.AsyncClient:
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(timeout=8.0)
+        return self._client
 
     async def get_quote(self, symbol: str) -> Optional[MarketDataResult]:
         symbol = symbol.upper().strip()
@@ -67,7 +72,8 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
         params = {"symbol": symbol, "token": self.api_key}
 
         try:
-            resp = await self.client.get(url, params=params)
+            client = self._get_client()
+            resp = await client.get(url, params=params)
             if resp.status_code == 200:
                 data = resp.json()
                 # Finnhub returns {'c': 0, 'd': null, ...} for invalid/non-existent symbols
@@ -113,7 +119,8 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
         params = {"symbol": symbol, "token": self.api_key}
 
         try:
-            resp = await self.client.get(url, params=params)
+            client = self._get_client()
+            resp = await client.get(url, params=params)
             if resp.status_code == 200:
                 data = resp.json()
                 if data and "name" in data:
@@ -135,7 +142,8 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
         params = {"symbol": symbol, "metric": "all", "token": self.api_key}
 
         try:
-            resp = await self.client.get(url, params=params)
+            client = self._get_client()
+            resp = await client.get(url, params=params)
             if resp.status_code == 200:
                 data = resp.json()
                 metrics = data.get("metric", {})
@@ -165,7 +173,8 @@ class FinnhubMarketDataProvider(BaseMarketDataProvider):
         params = {"q": query.strip().upper(), "token": self.api_key}
 
         try:
-            resp = await self.client.get(url, params=params)
+            client = self._get_client()
+            resp = await client.get(url, params=params)
             if resp.status_code == 200:
                 data = resp.json()
                 results = []

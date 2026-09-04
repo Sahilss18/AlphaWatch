@@ -1,6 +1,7 @@
 import logging
+import traceback
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -22,15 +23,19 @@ logging.basicConfig(
 logger = logging.getLogger("signal_watch")
 settings = get_settings()
 
+# Ensure schema exists on module load (critical for serverless where lifespan may not fire)
+try:
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables initialized.")
+except Exception as e:
+    logger.warning(f"Database schema initialization deferred: {e}")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan event: create tables, seed demo user and initial watchlist."""
+    """Lifespan event: ensure demo user and initial watchlist."""
     logger.info("Initializing Signal/Watch database tables...")
     try:
         Base.metadata.create_all(bind=engine)
-        logger.info("Database tables verified.")
-
-        # Ensure demo user and initial watchlist exist
         db = SessionLocal()
         try:
             user, watchlist = WatchlistService.ensure_demo_user(db, settings.DEMO_USER_ID)
@@ -51,22 +56,31 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Global exception handler for transparency
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled exception on {request.url.path}: {exc}\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": f"{type(exc).__name__}: {str(exc)}",
+            "path": request.url.path
+        }
+    )
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.ENVIRONMENT != "production" else settings.cors_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Mount API Routers
-app.include_router(health_router, prefix="/api")
-app.include_router(watchlist_router, prefix="/api")
-app.include_router(signals_router, prefix="/api")
-app.include_router(market_router, prefix="/api")
-app.include_router(visit_router, prefix="/api")
+# Mount API Routers under both /api and root to handle any proxy/rewrite topology
+for router in [health_router, watchlist_router, signals_router, market_router, visit_router]:
+    app.include_router(router, prefix="/api")
+    app.include_router(router)
 
 @app.get("/")
 def root():

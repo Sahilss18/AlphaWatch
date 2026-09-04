@@ -1,6 +1,9 @@
+import os
+import tempfile
 import logging
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy.pool import StaticPool
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -9,31 +12,39 @@ settings = get_settings()
 db_url = settings.DATABASE_URL
 engine = None
 
-# Attempt primary database connection (e.g. MySQL) with fallback to SQLite if host is unreachable
+# Determine writable directory for SQLite fallback (essential for Vercel/Lambda serverless /tmp)
+temp_dir = tempfile.gettempdir()
+sqlite_fallback_path = os.path.join(temp_dir, "signal_watch.db")
+sqlite_fallback_url = f"sqlite:///{sqlite_fallback_path.replace(os.sep, '/')}"
+
 try:
-    if "mysql" in db_url.lower():
+    if "mysql" in db_url.lower() and "localhost" not in db_url.lower():
         engine = create_engine(
             db_url,
             pool_pre_ping=True,
             pool_recycle=3600,
             echo=False,
-            connect_args={"connect_timeout": 4}
+            connect_args={"connect_timeout": 3}
         )
-        # Verify connection immediately
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        logger.info("Successfully connected to MySQL database.")
-    else:
+        logger.info("Successfully connected to external MySQL database.")
+    elif "sqlite" in db_url.lower():
         engine = create_engine(
             db_url,
-            connect_args={"check_same_thread": False} if "sqlite" in db_url else {},
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
             echo=False
         )
+    else:
+        # If localhost MySQL is specified on cloud or connection failed
+        raise ConnectionError("Localhost database not reachable in cloud serverless environment.")
 except Exception as e:
-    logger.warning(f"Could not connect to database ({db_url}): {e}. Initializing embedded SQLite database fallback.")
+    logger.warning(f"Using serverless SQLite database fallback ({sqlite_fallback_url}): {e}")
     engine = create_engine(
-        "sqlite:///./signal_watch.db",
+        sqlite_fallback_url,
         connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
         echo=False
     )
 
