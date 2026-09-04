@@ -27,16 +27,16 @@ export function HeroSection({
           </button>
         </div>
 
-        {/* Headline with Fraktur Bold Font */}
-        <div className="max-w-4xl">
+        {/* Headline with Elegant Fraktur Font & Glowing Animation */}
+        <div className="max-w-4xl group">
           <h1
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-normal text-white leading-[1.15]"
-            style={{ fontFamily: "'UnifrakturCook', 'UnifrakturMaguntia', 'Fraktur', serif, cursive" }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-wide text-white leading-[1.18] select-none"
+            style={{ fontFamily: "'UnifrakturMaguntia', 'Fraktur', serif, cursive" }}
           >
-            <span className="block mb-1 sm:mb-2 text-slate-100 drop-shadow-md">
+            <span className="block mb-1 sm:mb-2 text-slate-100 drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)] group-hover:text-white transition-all duration-300">
               Markets don't need narrating.
             </span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-fuchsia-400 drop-shadow-[0_4px_20px_rgba(132,0,255,0.35)]">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 via-purple-400 to-fuchsia-400 animate-gradient-flow animate-glow-pulse group-hover:scale-[1.01] transition-transform duration-300">
               They need what changed.
             </span>
           </h1>
