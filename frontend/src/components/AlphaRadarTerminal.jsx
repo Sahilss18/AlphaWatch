@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import {
-  Radar,
   Sparkles,
   Zap,
   TrendingUp,
-  ShieldCheck,
-  Cpu,
   Flame,
   Globe,
   Radio,
-  ArrowUpRight,
-  Filter,
-  BarChart3,
-  Layers
+  ArrowUpRight
 } from 'lucide-react';
+import CatalystDetailModal from './CatalystDetailModal';
 
 const RADAR_FACTORS = [
   {
@@ -58,9 +53,27 @@ const MOCK_RADAR_INSIGHTS = [
     trend: '+4.8%',
     badge: 'HIGH CONVICTION',
     badgeColor: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
-    description: 'Volume breakout 2.8x 20-day baseline accompanied by institutional call block purchases.',
+    description: 'Volume breakout 2.8x 20-day baseline accompanied by aggressive institutional call block sweeps.',
     tags: ['AI Hardware', 'RSI Bullish Divergence', '99th Percentile Volume'],
-    glow: 'rgba(6, 182, 212, 0.25)'
+    glow: 'rgba(6, 182, 212, 0.25)',
+    details: {
+      darkPoolShare: '68.4%',
+      gammaExposure: '+$2.45B GEX',
+      ivPercentile: '96th Percentile',
+      flowRatio: '4.2 : 1 (Calls/Puts)',
+      expectedMove: '±5.6%',
+      invalidationLevel: '$118.20',
+      targetRange: '$132.50 – $144.00',
+      winRateHistorical: '88% (54 Historical Setups)',
+      liquidityVacuum: 'Top 3% Order Thinning Detected',
+      macroSync: '+340bps vs Semi ETF (SMH)'
+    },
+    timeline: [
+      { time: '12 mins ago', event: 'Volume Spike 2.8x 20-day baseline triggered breakout alert', type: 'vol' },
+      { time: '34 mins ago', event: 'Dark Pool prints of 420k shares executed at $122.40 vWAP', type: 'whale' },
+      { time: '1 hour ago', event: 'Institutional 130C block sweeps purchased with $3.4M premium', type: 'flow' },
+      { time: 'Visit Checkpoint', event: 'Zero noise divergence registered against baseline', type: 'base' }
+    ]
   },
   {
     id: 2,
@@ -73,7 +86,24 @@ const MOCK_RADAR_INSIGHTS = [
     badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
     description: 'Statistically anomalous block trades executed at session vWAP baseline without retail slippage.',
     tags: ['Dark Pool', 'Accumulation Zone', 'Low Noise'],
-    glow: 'rgba(245, 158, 11, 0.22)'
+    glow: 'rgba(245, 158, 11, 0.22)',
+    details: {
+      darkPoolShare: '72.1%',
+      gammaExposure: '+$1.15B GEX',
+      ivPercentile: '78th Percentile',
+      flowRatio: '3.1 : 1 (Calls/Puts)',
+      expectedMove: '±2.8%',
+      invalidationLevel: '$224.00',
+      targetRange: '$238.00 – $246.50',
+      winRateHistorical: '81% (38 Historical Setups)',
+      liquidityVacuum: 'Off-exchange absorptive accumulation',
+      macroSync: '+140bps vs S&P 500 benchmark'
+    },
+    timeline: [
+      { time: '20 mins ago', event: 'Cross-market whale execution of 500k shares at $228.10', type: 'whale' },
+      { time: '1 hour ago', event: 'Order book imbalance skewed 74% to bid side', type: 'flow' },
+      { time: 'Visit Checkpoint', event: 'Baseline checkpoint locked with zero retail chasing', type: 'base' }
+    ]
   },
   {
     id: 3,
@@ -86,7 +116,24 @@ const MOCK_RADAR_INSIGHTS = [
     badgeColor: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
     description: 'Volatility expansion following 72-hour consolidation. Rapid mean-reversion risk mitigated.',
     tags: ['EV Sector', 'Mean Reversion', 'Breakout 2.4σ'],
-    glow: 'rgba(244, 63, 94, 0.25)'
+    glow: 'rgba(244, 63, 94, 0.25)',
+    details: {
+      darkPoolShare: '54.6%',
+      gammaExposure: '+$1.90B GEX',
+      ivPercentile: '94th Percentile',
+      flowRatio: '3.8 : 1 (Calls/Puts)',
+      expectedMove: '±7.2%',
+      invalidationLevel: '$210.00',
+      targetRange: '$236.00 – $250.00',
+      winRateHistorical: '79% (62 Historical Setups)',
+      liquidityVacuum: 'Rapid expansion above 2.4σ threshold',
+      macroSync: '+410bps vs Auto/Consumer Discretionary'
+    },
+    timeline: [
+      { time: '8 mins ago', event: 'Bollinger upper band excursion +2.4σ exceeded', type: 'vol' },
+      { time: '45 mins ago', event: 'Out-of-the-money call volume exceeded 200k contracts', type: 'flow' },
+      { time: 'Visit Checkpoint', event: 'Baseline compression transition confirmed', type: 'base' }
+    ]
   },
   {
     id: 4,
@@ -99,7 +146,23 @@ const MOCK_RADAR_INSIGHTS = [
     badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
     description: 'Enterprise cloud basket outperforming S&P 500 benchmark by +240bps on positive IT enterprise spend.',
     tags: ['Cloud Computing', 'Macro Hedge', 'Zero Noise'],
-    glow: 'rgba(16, 185, 129, 0.25)'
+    glow: 'rgba(16, 185, 129, 0.25)',
+    details: {
+      darkPoolShare: '61.8%',
+      gammaExposure: '+$850M GEX',
+      ivPercentile: '68th Percentile',
+      flowRatio: '2.9 : 1 (Calls/Puts)',
+      expectedMove: '±3.1%',
+      invalidationLevel: '$418.00',
+      targetRange: '$440.00 – $452.00',
+      winRateHistorical: '84% (42 Historical Setups)',
+      liquidityVacuum: 'Institutional rotational capital inflow',
+      macroSync: '+240bps vs S&P 500 Benchmark'
+    },
+    timeline: [
+      { time: '15 mins ago', event: 'Sector relative strength ratio broke 30-day resistance', type: 'macro' },
+      { time: '2 hours ago', event: 'Zero noise divergence observed across cloud peers', type: 'base' }
+    ]
   },
   {
     id: 5,
@@ -112,7 +175,23 @@ const MOCK_RADAR_INSIGHTS = [
     badgeColor: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
     description: 'Options dealer delta rehedging triggering upward mechanical price chase into Friday expiration.',
     tags: ['Semiconductors', 'Gamma Flip', 'Heavy Calls'],
-    glow: 'rgba(132, 0, 255, 0.25)'
+    glow: 'rgba(132, 0, 255, 0.25)',
+    details: {
+      darkPoolShare: '59.2%',
+      gammaExposure: '+$1.40B GEX',
+      ivPercentile: '91st Percentile',
+      flowRatio: '4.5 : 1 (Calls/Puts)',
+      expectedMove: '±6.0%',
+      invalidationLevel: '$144.00',
+      targetRange: '$162.00 – $174.00',
+      winRateHistorical: '86% (31 Historical Setups)',
+      liquidityVacuum: 'Dealer short gamma flip above $152.00',
+      macroSync: '+290bps vs Nasdaq 100'
+    },
+    timeline: [
+      { time: '5 mins ago', event: 'Dealer gamma threshold breached at $152 strike', type: 'flow' },
+      { time: '25 mins ago', event: 'Institutional block sweep of 160C weekly calls', type: 'whale' }
+    ]
   },
   {
     id: 6,
@@ -125,13 +204,30 @@ const MOCK_RADAR_INSIGHTS = [
     badgeColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
     description: 'Zero noisy false breakouts since your visit checkpoint. Consistent upward price trajectory.',
     tags: ['Search AI', 'Low Fatigue', 'Baseline Target'],
-    glow: 'rgba(99, 102, 241, 0.22)'
+    glow: 'rgba(99, 102, 241, 0.22)',
+    details: {
+      darkPoolShare: '65.0%',
+      gammaExposure: '+$920M GEX',
+      ivPercentile: '72nd Percentile',
+      flowRatio: '2.6 : 1 (Calls/Puts)',
+      expectedMove: '±2.4%',
+      invalidationLevel: '$168.00',
+      targetRange: '$180.00 – $186.00',
+      winRateHistorical: '80% (29 Historical Setups)',
+      liquidityVacuum: 'Steady institutional vWAP absorption',
+      macroSync: '+110bps vs Tech Sector'
+    },
+    timeline: [
+      { time: '30 mins ago', event: 'Quiet accumulation confirmed with zero volatility spikes', type: 'base' },
+      { time: 'Visit Checkpoint', event: 'Baseline checkpoint set with pristine signal hygiene', type: 'base' }
+    ]
   }
 ];
 
-export function AlphaRadarTerminal({ onSelectStock }) {
+export function AlphaRadarTerminal() {
   const [selectedFactor, setSelectedFactor] = useState('all');
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [activeCatalystModal, setActiveCatalystModal] = useState(null);
 
   const filteredInsights =
     selectedFactor === 'all'
@@ -155,11 +251,11 @@ export function AlphaRadarTerminal({ onSelectStock }) {
               Alpha Catalyst Matrix
             </h2>
             <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-semibold">
-              Live Feed
+              Live Matrix
             </span>
           </div>
           <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-            Continuously synthesizing cross-asset order flow, volatility surfaces, and macro sector momentum into high-conviction signals. Click any card for full telemetry.
+            Continuously synthesizing cross-asset order flow, dark pool whale prints, gamma exposure, and macro relative strength. Click any card to inspect the full Catalyst Dossier.
           </p>
         </div>
 
@@ -203,7 +299,7 @@ export function AlphaRadarTerminal({ onSelectStock }) {
           return (
             <div
               key={insight.id}
-              onClick={() => onSelectStock && onSelectStock(insight.ticker)}
+              onClick={() => setActiveCatalystModal(insight)}
               onMouseEnter={() => setHoveredCard(insight.id)}
               onMouseLeave={() => setHoveredCard(null)}
               className="group relative bg-[#0b0f19]/90 border border-[#1e2538] hover:border-purple-500/60 rounded-2xl p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 shadow-xl overflow-hidden flex flex-col justify-between cursor-pointer select-none"
@@ -274,8 +370,8 @@ export function AlphaRadarTerminal({ onSelectStock }) {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-1 text-slate-400 group-hover:text-cyan-300 font-mono text-[10px] transition-colors">
-                  <span>Deep-dive</span>
+                <div className="flex items-center gap-1.5 text-cyan-400 group-hover:text-cyan-300 font-mono text-[10px] font-semibold transition-colors">
+                  <span>Catalyst Dossier</span>
                   <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </div>
               </div>
@@ -283,6 +379,13 @@ export function AlphaRadarTerminal({ onSelectStock }) {
           );
         })}
       </div>
+
+      {/* Catalyst Intelligence Dossier Modal */}
+      <CatalystDetailModal
+        catalyst={activeCatalystModal}
+        isOpen={!!activeCatalystModal}
+        onClose={() => setActiveCatalystModal(null)}
+      />
     </section>
   );
 }
