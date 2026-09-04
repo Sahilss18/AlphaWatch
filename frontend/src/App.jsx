@@ -14,7 +14,7 @@ import { ArchitectureSection } from './components/ArchitectureSection';
 import { Footer } from './components/Footer';
 import { AddTickerModal } from './components/AddTickerModal';
 import { StockDetailModal } from './components/StockDetailModal';
-import { LiquidEther } from './components/LiquidEther';
+import LiquidEther from './components/LiquidEther';
 import { AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 
 export function App() {
