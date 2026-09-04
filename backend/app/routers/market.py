@@ -118,7 +118,7 @@ async def get_market_quote(symbol: str, db: Session = Depends(get_db)):
                 "is_stale": True,
                 "source": "mysql_cached"
             }
-        raise HTTPException(status_code=404, detail=f"Quote not found for {sym}")
+        quote = market_svc.get_fallback_baseline_quote(sym)
     
     return {
         "symbol": sym,

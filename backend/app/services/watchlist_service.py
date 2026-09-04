@@ -166,9 +166,7 @@ class WatchlistService:
                         source="mysql_fallback"
                     )
                 else:
-                    quote = await market_service.provider.get_quote(sym)
-                    if not quote:
-                        continue
+                    quote = market_service.get_fallback_baseline_quote(sym)
 
             quotes_map[sym] = quote
             SnapshotService.record_snapshot(db, quote)
@@ -373,9 +371,7 @@ class WatchlistService:
                         source="mysql_fallback"
                     )
                 else:
-                    quote = await market_service.provider.get_quote(sym)
-                    if not quote:
-                        continue
+                    quote = market_service.get_fallback_baseline_quote(sym)
 
             quotes_map[sym] = quote
             last_visit_snap = SnapshotService.get_snapshot_at_or_before(db, sym, last_visit_time) if last_visit_time else None
@@ -511,8 +507,10 @@ class WatchlistService:
         db.refresh(stock)
 
         quote = await market_service.get_live_quote(clean_sym)
-        if quote:
-            SnapshotService.record_snapshot(db, quote)
+        if not quote:
+            quote = market_service.get_fallback_baseline_quote(clean_sym)
+        
+        SnapshotService.record_snapshot(db, quote)
         
         return stock
 
